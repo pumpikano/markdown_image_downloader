@@ -20,7 +20,7 @@ well, which provides the directory string to build local image paths in the Mark
 Firebase domain, which is where Roam stores images (this works for me, but if there are other Firebase images in your
 database which are not from Roam, you may want to further restrict this filter).
 
-It is wise to backup you database before running real execution. To execute edits, run the same command without
+It is wise to backup your database before running real execution. To execute edits, run the same command without
 `--dry_run`, i.e.:
 
 python markdown_image_downloader.py \
@@ -297,6 +297,10 @@ class ImageUrlReplacementPlan:
       logging.info('Replacing URLs in file %s...', filepath)
       with open(filepath, 'r') as f:
         md_source = f.read()
+
+      # Sort in reverse order of URL length. Replacing URLs in the order guards against the edge case where a URL is a
+      # substring of another.
+      image_url_records.sort(reverse=True, key=lambda x: len(x.url))
 
       # For each URL in this file, check if we can replace it and do so if possible.
       for img in image_url_records:
